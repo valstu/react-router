@@ -1,5 +1,8 @@
 import React, { PropTypes } from 'react'
-import { Route } from 'react-router'
+import {
+  Route,
+  resolveLocation
+} from 'react-router'
 import Link from './Link'
 
 /**
@@ -15,25 +18,29 @@ const NavLink = ({
   style,
   isActive: getIsActive,
   ...rest
-}) => (
-  <Route
-    path={typeof to === 'object' ? to.pathname : to}
-    exact={exact}
-    strict={strict}
-    children={({ location, match }) => {
-      const isActive = !!(getIsActive ? getIsActive(match, location) : match)
+}, { route }) => {
+  const resolvedTo = resolveLocation(to, route.match)
+  const path = typeof resolvedTo === 'object' ? resolvedTo.pathname : resolvedTo
+  return (
+    <Route
+      path={path}
+      exact={exact}
+      strict={strict}
+      children={({ location, match }) => {
+        const isActive = !!(getIsActive ? getIsActive(match, location) : match)
 
-      return (
-        <Link
-          to={to}
-          className={isActive ? [ activeClassName, className ].join(' ') : className}
-          style={isActive ? { ...style, ...activeStyle } : style}
-          {...rest}
-        />
-      )
-    }}
-  />
-)
+        return (
+          <Link
+            to={resolvedTo}
+            className={isActive ? [ activeClassName, className ].join(' ') : className}
+            style={isActive ? { ...style, ...activeStyle } : style}
+            {...rest}
+          />
+        )
+      }}
+    />
+  )
+}
 
 NavLink.propTypes = {
   to: Link.propTypes.to,
@@ -44,6 +51,12 @@ NavLink.propTypes = {
   activeStyle: PropTypes.object,
   style: PropTypes.object,
   isActive: PropTypes.func
+}
+
+NavLink.contextTypes = {
+  route: PropTypes.shape({
+    match: PropTypes.object
+  })
 }
 
 export default NavLink

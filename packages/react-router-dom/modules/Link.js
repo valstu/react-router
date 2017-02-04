@@ -1,4 +1,5 @@
 import React, { PropTypes } from 'react'
+import resolveLocation from './resolveLocation'
 
 const isModifiedEvent = (event) =>
   !!(event.metaKey || event.altKey || event.ctrlKey || event.shiftKey)
@@ -12,7 +13,12 @@ class Link extends React.Component {
       push: PropTypes.func.isRequired,
       replace: PropTypes.func.isRequired,
       createHref: PropTypes.func.isRequired
-    }).isRequired
+    }).isRequired,
+    route: PropTypes.shape({
+      match: PropTypes.shape({
+        url: PropTypes.string
+      })
+    })
   }
 
   static propTypes = {
@@ -42,8 +48,8 @@ class Link extends React.Component {
       event.preventDefault()
 
       const { history } = this.context
-      const { replace, to } = this.props
-
+      const { replace } = this.props
+      const to = this.getLocation()
       if (replace) {
         history.replace(to)
       } else {
@@ -52,9 +58,15 @@ class Link extends React.Component {
     }
   }
 
-  render() {
-    const { replace, to, ...props } = this.props // eslint-disable-line no-unused-vars
+  getLocation() {
+    const { to } = this.props
+    const { match } = this.context.route
+    return resolveLocation(to, match)
+  }
 
+  render() {
+    const { replace, to:undefTo, ...props } = this.props // eslint-disable-line no-unused-vars
+    const to = this.getLocation()
     const href = this.context.history.createHref(
       typeof to === 'string' ? { pathname: to } : to
     )

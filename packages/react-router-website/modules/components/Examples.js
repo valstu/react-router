@@ -66,6 +66,11 @@ const EXAMPLES = [
     path: '/examples/modal-gallery',
     load: require('bundle?lazy!babel!../examples/ModalGallery'),
     loadSource: require('bundle?lazy!!prismjs?lang=jsx!../examples/ModalGallery.js')
+  },
+  { name: 'Relative Links',
+    path: '/examples/relative-links',
+    load: require('bundle?lazy!babel!../examples/RelativeLinks'),
+    loadSource: require('bundle?lazy!!prismjs?lang=jsx!../examples/RelativeLinks.js')
   }
 ]
 

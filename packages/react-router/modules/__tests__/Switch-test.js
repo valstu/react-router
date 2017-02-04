@@ -119,6 +119,39 @@ describe('A <Switch>', () => {
     expect(node.innerHTML).toNotContain('bub')
     expect(node.innerHTML).toContain('cup')
   })
+
+  it('renders relative <Route>s', () => {
+    const node = document.createElement('div')
+
+    ReactDOM.render((
+      <MemoryRouter initialEntries={[ '/sauce/sriracha' ]}>
+        <Route path='/sauce' render={() => (
+          <Switch>
+            <Route path="sriracha" render={() => <div>sriracha</div>}/>
+          </Switch>
+        )} />
+      </MemoryRouter>
+    ), node)
+
+    expect(node.innerHTML).toContain('sriracha')
+  })
+
+  it('renders relative <Redirect>s', () => {
+    const node = document.createElement('div')
+
+    ReactDOM.render((
+      <MemoryRouter initialEntries={[ '/sauce/tobasco' ]}>
+        <Route path='/sauce' render={() => (
+          <Switch>
+            <Route path="sriracha" render={() => <div>sriracha</div>}/>
+            <Redirect from="tobasco" to="/sauce/sriracha"/>
+          </Switch>
+        )} />
+      </MemoryRouter>
+    ), node)
+
+    expect(node.innerHTML).toContain('sriracha')
+  })
 })
 
 

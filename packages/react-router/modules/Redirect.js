@@ -1,4 +1,5 @@
 import React, { PropTypes } from 'react'
+import resolveLocation from './resolveLocation'
 
 /**
  * The public API for updating the location programatically
@@ -10,7 +11,12 @@ class Redirect extends React.Component {
       push: PropTypes.func.isRequired,
       replace: PropTypes.func.isRequired,
       staticContext: PropTypes.object
-    }).isRequired
+    }).isRequired,
+    route: PropTypes.shape({
+      match: PropTypes.shape({
+        url: PropTypes.string
+      })
+    })
   }
 
   static propTypes = {
@@ -36,13 +42,13 @@ class Redirect extends React.Component {
   }
 
   perform() {
-    const { history } = this.context
+    const { history, route } = this.context
     const { push, to } = this.props
-
+    const loc = resolveLocation(to, route.match)
     if (push) {
-      history.push(to)
+      history.push(loc)
     } else {
-      history.replace(to)
+      history.replace(loc)
     }
   }
 

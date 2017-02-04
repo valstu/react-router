@@ -19,6 +19,7 @@
     "index.js",
     "matchPath.js",
     "withRouter.js",
+    "resolveLocation.js",
     "README.md",
     "es",
     "umd"

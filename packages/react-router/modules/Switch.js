@@ -31,11 +31,12 @@ class Switch extends React.Component {
     const { children } = this.props
     const location = this.props.location || this.context.route.location
 
+    const { match:parentMatch } = this.context.route
     let match, child
     React.Children.forEach(children, element => {
       if (match == null) {
         child = element
-        match = matchPath(location.pathname, element.props)
+        match = matchPath(location.pathname, element.props, parentMatch)
       }
     })
 

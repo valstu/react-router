@@ -275,7 +275,7 @@ describe('A <Route location>', () => {
       </MemoryRouter>
     ), node)
 
-    expect(node.innerHTML).toContain(TEXT)
+    expect(node.innerHTML).toContain(TEXT)      
   })
 
   describe('children', () => {
@@ -324,5 +324,55 @@ describe('A <Route location>', () => {
       push('/chips')
       expect(node.innerHTML).toContain(TEXT)
     })
+  })
+})
+
+describe('A relative <Route>', () => {
+  it('works for direct children of <Router>', () => {
+    const TEXT = 'uncle'
+    const node = document.createElement('div')
+
+    ReactDOM.render((
+      <MemoryRouter initialEntries={[ '/uncle' ]}>
+        <Route path="uncle" render={() => (
+          <h1>{TEXT}</h1>
+        )}/>
+      </MemoryRouter>
+    ), node)
+
+    expect(node.innerHTML).toContain(TEXT)      
+  })
+
+  it('resolves relative to parent match', () => {
+    const TEXT = 'cousin'
+    const node = document.createElement('div')
+
+    ReactDOM.render((
+      <MemoryRouter initialEntries={[ '/uncle/cousin' ]}>
+        <Route path="uncle" render={() => (
+          <Route path="cousin" render={() => (
+            <h1>{TEXT}</h1>
+          )} />
+        )}/>
+      </MemoryRouter>
+    ), node)
+
+    expect(node.innerHTML).toContain(TEXT)
+  })
+
+  it('fails to match when parent match is null', () => {
+    const TEXT = 'brother'
+    const node = document.createElement('div')
+
+    ReactDOM.render((
+      <MemoryRouter initialEntries={[ '/sister' ]}>
+        <Route path="brother" children={() => (
+          <div>
+            <Route path=":anything" render={() => <div>{TEXT}</div>}/>
+          </div>
+        )}/>
+      </MemoryRouter>
+    ), node)
+    expect(node.innerHTML).toNotContain(TEXT)
   })
 })
