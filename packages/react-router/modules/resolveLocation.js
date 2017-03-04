@@ -23,7 +23,7 @@ const join = (pathname, match) => {
     return match.url
 
   const { remainingPathname, count } = removeDoubleDots(pathname)
-  const resolvedBase = getParentMatch(match, count)
+  const resolvedBase = getParentBasePath(match, count)
 
   const resolvedPathname = addTrailingSlash(resolvedBase) + remainingPathname
 
@@ -32,14 +32,22 @@ const join = (pathname, match) => {
     : resolvedPathname
 }
 
-const getParentMatch = (match, depth) => {
+const getParentBasePath = (match, depth) => {
   if (depth === 0) {
     return match.url
   }
+
+  let currentDepth = 0
+  let currentMatch = match
+  while (currentDepth < depth && currentMatch != null) {
+    currentMatch = currentMatch.parent
+    currentDepth++
+  }
+
   // if the double-dot count is greater than the known parents,
   // we will just resolve as if the base is the root
-  const parentURL = match.parents[depth-1]
-  return parentURL ? parentURL : '/'
+  return currentMatch ? currentMatch.url : '/'
+
 }
 
 const isAbsolute = pathname => !!(pathname && pathname.charAt(0) === '/')

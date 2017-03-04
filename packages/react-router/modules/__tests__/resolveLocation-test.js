@@ -2,7 +2,13 @@ import expect from 'expect'
 import resolveLocation from '../resolveLocation'
 
 describe('resolveLocation', () => {
-  const BaseMatch = { url: '/a/b', parents: [ '/a' ] }
+  const BaseMatch = {
+    url: '/a/b',
+    parent: {
+      url: '/a',
+      parent: null
+    }
+  }
 
   describe('bad matches', () => {
     const cases = [
@@ -31,7 +37,7 @@ describe('resolveLocation', () => {
   })
 
   describe('double-dot notation relative paths', () => {
-    it('uses match.parents array to determine url to resolve with', () => {
+    it('uses match.parent to determine url to resolve with', () => {
       const pathname = resolveLocation('../where', BaseMatch)
       expect(pathname).toBe('/a/where')
     })
@@ -91,12 +97,12 @@ describe('resolveLocation', () => {
       const cases = [
         // base without trailing slash
         [{ url: '/base' }, '', '/base'],
-        [{ url: '/base/nested', parents: [ '/base' ]  }, '..', '/base'],
-        [{ url: '/base/nested', parents: [ '/base' ]  }, '../', '/base/'],
+        [{ url: '/base/nested', parent: { url: '/base' } }, '..', '/base'],
+        [{ url: '/base/nested', parent: { url: '/base' } }, '../', '/base/'],
         // base with trailing slash
         [{ url: '/base/' }, '', '/base/'],
-        [{ url: '/base/nested', parents: [ '/base/' ] }, '..', '/base/'],
-        [{ url: '/base/nested', parents: [ '/base/' ]  }, '../', '/base/'],
+        [{ url: '/base/nested', parent: { url: '/base/' } }, '..', '/base/'],
+        [{ url: '/base/nested', parent: { url: '/base/' } }, '../', '/base/'],
       ]
       cases.forEach(([base, pathname, expected]) => {
         expect(resolveLocation(pathname, base)).toEqual(expected)

@@ -1,4 +1,5 @@
 import pathToRegexp from 'path-to-regexp'
+import warning from 'warning'
 
 const patternCache = {}
 const cacheLimit = 10000
@@ -38,9 +39,15 @@ const matchPath = (pathname, options = {}, parentMatch) => {
   if (path == null)
     return parentMatch != null
       ? parentMatch
-      : { url: pathname, isExact: true, params: {}, parents: [] }
+      : { url: pathname, isExact: true, params: {}, parent: null }
 
-  if (isRelative)
+  warning(
+    !(isRelative && parentMatch == null),
+    'Relative paths will not be resolved when their parent match is null. You are most likely attempting to use a relative path inside of a parent <Route> that has a "children" prop, but that <Route>\'s path does not match the current location.'
+  )
+
+  // attempting to resolve when parent match is null is a losing battle
+  if (isRelative && parentMatch != null)
     path = resolvePath(path, parentMatch)
 
   const { re, keys } = compilePath(path, { end: exact, strict })
@@ -73,17 +80,24 @@ const matchPath = (pathname, options = {}, parentMatch) => {
     url, // the matched portion of the URL
     isExact, // whether or not we matched exactly
     params,
-    parents: joinParentURLs(url, parentMatch)
+    parent: getParent(url, parentMatch)
   }
 }
 
-// We do not want the same URL to be duplicated in the parents array
-// so we must verify that the matched URL is not the same as the parent URL
-const joinParentURLs = (url, match) => {
-  if (match == null) {
-    return []
-  }
-  return url === match.url ? match.parents : [match.url].concat(match.parents)
+// When the matched URL is the same as the parent match's URL
+// we should link to that match's parent so that double-dot relative
+// paths always resolve "up" the hierarchy, not "sideways".
+// i.e., given the match url tree:
+//   / -> /test -> /test/ing
+// If we resolve the path ../ed, we would get the URL /test/ed
+// However, if we allowed for duplicate URLs to show up in the tree:
+//   / -> /test -> /test/ing -> /test/ing
+// 
+const getParent = (url, match) => {
+  if (match == null)
+    return null
+
+  return url === match.url ? match.parent : match
 }
 
 const resolvePath = (pathname, match) => {

@@ -70,14 +70,14 @@ describe('matchPath', () => {
         url: path,
         params: {},
         isExact: true,
-        parents: []
+        parent: null
       })
     })
   })
 
   describe('parent match', () => {
 
-    it('prepends parent match\'s url to match.parents', () => {
+    it('sets match\'s parent', () => {
       const path = '/poet/jack-prelutsky/:poem'
       const pathname = '/poet/jack-prelutsky/a-pizza-the-size-of-the-sun'
       const parentMatch = {
@@ -85,20 +85,29 @@ describe('matchPath', () => {
         path: '/poet/:poet',
         params: { poet: 'jack-prelutsky' },
         isExact: true,
-        parents: ['/poet']
+        parent: {
+          url: '/poet'
+        }
       }
       const match = matchPath(pathname, { path }, parentMatch)
-      expect(match.parents).toEqual(['/poet/jack-prelutsky', '/poet'])
+      expect(match.parent).toEqual(parentMatch)
     })
 
-    it('does not prepend parent match\'s url when it is the same as the matched url', () => {
-      const parent = { url: '/first/second', parents: [ '/first' ] }
+    it('uses grandparent when parent match\'s url is the same as the matched url', () => {
+      const grandparent = {
+        url: '/first',
+        parent: null
+      }
+      const parent = {
+        url: '/first/second',
+        parent: grandparent
+      }
       const match = matchPath(
         '/first/second',
         { path: '/first/second' },
         parent
       )
-      expect(match.parents).toEqual([ '/first' ])
+      expect(match.parent).toEqual(grandparent)
     })
   })
 

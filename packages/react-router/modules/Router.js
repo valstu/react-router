@@ -36,7 +36,7 @@ class Router extends React.Component {
       url: '/',
       params: {},
       isExact: pathname === '/',
-      parents: []
+      parent: null
     }
   }
 
