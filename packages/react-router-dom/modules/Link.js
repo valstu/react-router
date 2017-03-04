@@ -35,6 +35,10 @@ class Link extends React.Component {
     replace: false
   }
 
+  state = {
+    to: resolveLocation(this.props.to, this.context.route.match)
+  }
+
   handleClick = (event) => {
     if (this.props.onClick)
       this.props.onClick(event)
@@ -49,7 +53,7 @@ class Link extends React.Component {
 
       const { history } = this.context
       const { replace } = this.props
-      const to = this.getLocation()
+      const { to } = this.state
       if (replace) {
         history.replace(to)
       } else {
@@ -58,15 +62,15 @@ class Link extends React.Component {
     }
   }
 
-  getLocation() {
-    const { to } = this.props
-    const { match } = this.context.route
-    return resolveLocation(to, match)
+  componentWillReceiveProps(nextProps, nextContext) {
+    this.setState({
+      to: resolveLocation(nextProps.to, nextProps.route.match)
+    })
   }
 
   render() {
     const { replace, to:undefTo, ...props } = this.props // eslint-disable-line no-unused-vars
-    const to = this.getLocation()
+    const { to } = this.state
     const href = this.context.history.createHref(
       typeof to === 'string' ? { pathname: to } : to
     )
