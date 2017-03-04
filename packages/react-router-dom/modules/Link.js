@@ -64,7 +64,7 @@ class Link extends React.Component {
 
   componentWillReceiveProps(nextProps, nextContext) {
     this.setState({
-      to: resolveLocation(nextProps.to, nextProps.route.match)
+      to: resolveLocation(nextProps.to, nextContext.route.match)
     })
   }
 
