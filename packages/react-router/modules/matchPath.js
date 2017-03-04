@@ -78,7 +78,7 @@ const matchPath = (pathname, options = {}, parentMatch) => {
 }
 
 // We do not want the same URL to be duplicated in the parents array
-// so we must verify that 
+// so we must verify that the matched URL is not the same as the parent URL
 const joinParentURLs = (url, match) => {
   if (match == null) {
     return []
