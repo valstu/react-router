@@ -10,6 +10,8 @@
   "files": [
     "ConnectedRouter.js",
     "reducer.js",
+    "actions.js",
+    "middleware.js",
     "index.js",
     "README.md",
     "es",
